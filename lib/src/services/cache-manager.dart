@@ -22,6 +22,12 @@ class CacheManager {
   /// This map holds the cached data
   final Map<String, dynamic> _cache = {};
 
+  Map<String, dynamic> get cache => _cache;
+
+  void clear() {
+    _cache.clear();
+  }
+
   /// Put a new data into cache, if the data already exists, replace it
   void put(String type, String name, dynamic obj) {
     _cache[type + ':' + name] = obj;

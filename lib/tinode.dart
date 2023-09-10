@@ -61,8 +61,12 @@ class Tinode {
   /// Authentication service, responsible for managing credentials and user id
   late AuthService _authService;
 
+  AuthService get authService => _authService;
+
   /// Cache manager service, responsible for read and write operations on cached data
   late CacheManager _cacheManager;
+
+  CacheManager get cache => _cacheManager;
 
   /// Configuration service, responsible for storing library config and information
   late ConfigService _configService;
@@ -110,8 +114,9 @@ class Tinode {
   /// `options` connection configuration and api key
   ///
   /// `loggerEnabled` pass `true` if you want to turn the logger on
-  Tinode(String appName, ConnectionOptions options, bool loggerEnabled) {
-    _registerDependencies(options, loggerEnabled);
+  Tinode(String appName, ConnectionOptions options, bool loggerEnabled,
+      {bool reset = false}) {
+    _registerDependencies(options, loggerEnabled, reset: reset);
     _resolveDependencies();
 
     _configService.appName = appName;
@@ -119,9 +124,11 @@ class Tinode {
   }
 
   /// Register services in dependency injection container
-  void _registerDependencies(ConnectionOptions options, bool loggerEnabled) {
+  void _registerDependencies(ConnectionOptions options, bool loggerEnabled,
+      {bool reset = false}) async {
+    if (reset) await GetIt.I.reset();
     var registered = GetIt.I.isRegistered<ConfigService>();
-
+    print('Tinode._registerDependencies: $registered');
     if (!registered) {
       GetIt.I.registerSingleton<ConfigService>(ConfigService(loggerEnabled));
       GetIt.I.registerSingleton<LoggerService>(LoggerService());
@@ -293,12 +300,14 @@ class Tinode {
   /// Create or update an account
   ///
   /// * Scheme can be `basic` or `token` or `reset`
-  Future account(String userId, String scheme, String secret, bool login, AccountParams? params) {
+  Future account(String userId, String scheme, String secret, bool login,
+      AccountParams? params) {
     return _tinodeService.account(userId, scheme, secret, login, params);
   }
 
   /// Create a new user. Wrapper for `account` method
-  Future createAccount(String scheme, String secret, bool login, AccountParams? params) {
+  Future createAccount(String scheme, String secret, bool login,
+      AccountParams? params) {
     var promise = account(topic_names.USER_NEW, scheme, secret, login, params);
     if (login) {
       promise = promise.then((dynamic ctrl) {
@@ -311,24 +320,28 @@ class Tinode {
 
   /// Create user with 'basic' authentication scheme and immediately
   /// use it for authentication. Wrapper for `createAccount`
-  Future createAccountBasic(String username, String password, bool login, AccountParams? params) {
+  Future createAccountBasic(String username, String password, bool login,
+      AccountParams? params) {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     return createAccount('basic', secret, login, params);
   }
 
   /// Update account with basic
-  Future updateAccountBasic(String userId, String username, String password, AccountParams? params) {
+  Future updateAccountBasic(String userId, String username, String password,
+      AccountParams? params) {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     return account(userId, 'basic', secret, false, params);
   }
 
   /// Authenticate current session
-  Future<CtrlMessage> login(String scheme, String secret, Map<String, dynamic>? cred) {
+  Future<CtrlMessage> login(String scheme, String secret,
+      Map<String, dynamic>? cred) {
     return _tinodeService.login(scheme, secret, cred);
   }
 
   /// Wrapper for `login` with basic authentication
-  Future<CtrlMessage> loginBasic(String username, String password, Map<String, dynamic>? cred) async {
+  Future<CtrlMessage> loginBasic(String username, String password,
+      Map<String, dynamic>? cred) async {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     var ctrl = await login('basic', secret, cred);
     _authService.setLastLogin(username);
@@ -345,7 +358,8 @@ class Tinode {
   /// * method - method to use for resetting the secret, such as "email" or "tel"
   /// * value - value of the credential to use, a specific email address or a phone number
   Future requestResetSecret(String scheme, String method, String value) {
-    var secret = base64.encode(utf8.encode(scheme + ':' + method + ':' + value));
+    var secret = base64.encode(
+        utf8.encode(scheme + ':' + method + ':' + value));
     return login('reset', secret, null);
   }
 

@@ -35,7 +35,7 @@ class MetaGetBuilder {
 
   /// Get latest timestamp
   DateTime _getIms() {
-    var cupd = contact != null ? contact?.updated : null;
+    var cupd = contact != null ? contact?.updated : DateTime.now();
     var tupd = topic.lastDescUpdate;
     return tupd.isAfter(cupd!) ? cupd : tupd;
   }
@@ -57,7 +57,7 @@ class MetaGetBuilder {
 
   /// Add query parameters to fetch messages older than the earliest saved message
   MetaGetBuilder withEarlierData(int limit) {
-    return withData(null, (topic.minSeq > 0 ? topic.minSeq : null)!, limit);
+    return withData(null, topic.minSeq!=null &&topic.minSeq > 0 ? topic.minSeq : null, limit);
   }
 
   /// Add query parameters to fetch topic description if it's newer than the given timestamp

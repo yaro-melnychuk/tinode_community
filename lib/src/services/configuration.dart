@@ -29,16 +29,17 @@ class ConfigService {
   }
 
   String get userAgent {
-    return appName + ' (Dart; ' + Platform.operatingSystem + '); tinode-dart/' + appVersion;
+    return appName + ' (Dart; ' + Platform.operatingSystem + '); tinode-dart/' +
+        appVersion;
   }
 
   String get platform {
     if (Platform.isAndroid) {
-      return 'Android';
+      return 'android';
     } else if (Platform.isFuchsia) {
       return 'Fuchsia';
     } else if (Platform.isIOS) {
-      return 'IOS';
+      return 'ios';
     } else if (Platform.isLinux) {
       return 'Linux';
     } else if (Platform.isMacOS) {
