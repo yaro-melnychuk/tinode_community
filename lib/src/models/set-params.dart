@@ -1,6 +1,4 @@
-import 'package:tinode/src/models/topic-description.dart';
-import 'package:tinode/src/models/topic-subscription.dart';
-import 'package:tinode/src/models/credential.dart';
+import 'model.dart';
 
 class SetParams {
   TopicDescription? desc;

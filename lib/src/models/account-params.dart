@@ -1,5 +1,4 @@
-import 'package:tinode/src/models/credential.dart';
-import 'package:tinode/src/models/def-acs.dart';
+import 'model.dart';
 
 /// Defined parameters for an account
 class AccountParams {

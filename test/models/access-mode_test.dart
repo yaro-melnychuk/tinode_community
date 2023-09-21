@@ -1,5 +1,5 @@
-import 'package:tinode/src/models/access-mode.dart';
 import 'package:test/test.dart';
+import 'package:tinode_community/src/models/model.dart';
 
 void main() {
   test('decode(null) returns null', () {

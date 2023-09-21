@@ -1,32 +1,17 @@
-import 'package:rxdart/rxdart.dart';
-import 'package:get_it/get_it.dart';
-
 import 'dart:async';
 import 'dart:math';
 
-import 'package:tinode/src/models/message-status.dart' as message_status;
-import 'package:tinode/src/models/topic-names.dart' as topic_names;
-import 'package:tinode/src/models/delete-transaction.dart';
-import 'package:tinode/src/models/topic-subscription.dart';
-import 'package:tinode/src/models/topic-description.dart';
-import 'package:tinode/src/services/cache-manager.dart';
-import 'package:tinode/src/models/server-messages.dart';
-import 'package:tinode/src/services/configuration.dart';
-import 'package:tinode/src/models/access-mode.dart';
-import 'package:tinode/src/models/credential.dart';
-import 'package:tinode/src/models/set-params.dart';
-import 'package:tinode/src/meta-get-builder.dart';
-import 'package:tinode/src/models/del-range.dart';
-import 'package:tinode/src/models/get-query.dart';
-import 'package:tinode/src/services/logger.dart';
-import 'package:tinode/src/services/tinode.dart';
-import 'package:tinode/src/models/message.dart';
-import 'package:tinode/src/models/def-acs.dart';
-import 'package:tinode/src/services/tools.dart';
-import 'package:tinode/src/models/values.dart';
-import 'package:tinode/src/services/auth.dart';
-import 'package:tinode/src/sorted-cache.dart';
-import 'package:tinode/src/topic-me.dart';
+import 'package:get_it/get_it.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:tinode_community/src/builders/meta-get-builder.dart';
+import 'package:tinode_community/src/models/message-status.dart'
+    as message_status;
+import 'package:tinode_community/src/models/topic-names.dart' as topic_names;
+
+import '../models/model.dart';
+import '../services/service.dart';
+import '../utils/sorted-cache.dart';
+import 'topic-me.dart';
 
 class Topic {
   /// This topic's name
@@ -71,8 +56,8 @@ class Topic {
   late List<String> tags;
 
   /// Message cache, sorted by message seq values, from old to new
-  final SortedCache<DataMessage> _messages = SortedCache<DataMessage>((a,
-      b) => (a.seq ?? 0) - (b.seq ?? 0), true);
+  final SortedCache<DataMessage> _messages =
+      SortedCache<DataMessage>((a, b) => (a.seq ?? 0) - (b.seq ?? 0), true);
 
   /// true if the topic is currently live
   bool _subscribed = false;
@@ -129,8 +114,8 @@ class Topic {
   PublishSubject<Topic> onMetaDesc = PublishSubject<Topic>();
 
   /// This event will be triggered when a `meta.sub` message is received
-  PublishSubject<TopicSubscription> onMetaSub = PublishSubject<
-      TopicSubscription>();
+  PublishSubject<TopicSubscription> onMetaSub =
+      PublishSubject<TopicSubscription>();
 
   /// This event will be triggered when a `pres` message is received
   PublishSubject<PresMessage> onPres = PublishSubject<PresMessage>();
@@ -139,8 +124,8 @@ class Topic {
   PublishSubject<InfoMessage> onInfo = PublishSubject<InfoMessage>();
 
   /// This event will be triggered when topic subscriptions are updated
-  PublishSubject<List<TopicSubscription>> onSubsUpdated = PublishSubject<
-      List<TopicSubscription>>();
+  PublishSubject<List<TopicSubscription>> onSubsUpdated =
+      PublishSubject<List<TopicSubscription>>();
 
   /// This event will be triggered when topic tags are updated
   PublishSubject<List<String>> onTagsUpdated = PublishSubject<List<String>>();
@@ -171,8 +156,8 @@ class Topic {
     _subscribed = value;
   }
 
-  Future<CtrlMessage> subscribe(GetQuery getParams,
-      SetParams? setParams) async {
+  Future<CtrlMessage> subscribe(
+      GetQuery getParams, SetParams? setParams) async {
     // If the topic is already subscribed, return resolved promise
     if (isSubscribed) {
       return Future.error(Exception('topic is already subscribed'));
@@ -199,8 +184,9 @@ class Topic {
     }
 
     _subscribed = true;
-    acs = (ctrl.params != null && ctrl.params['acs'] != null) ? AccessMode(
-        ctrl.params['acs']) : acs;
+    acs = (ctrl.params != null && ctrl.params['acs'] != null)
+        ? AccessMode(ctrl.params['acs'])
+        : acs;
 
     // Set topic name for new topics and add it to cache.
     if (_new) {
@@ -290,6 +276,7 @@ class Topic {
       _cacheManager.delete('topic', name ?? '');
       _gone();
     }
+    if (ctrl is CtrlMessage) return ctrl;
     return CtrlMessage.fromMessage(ctrl);
   }
 
@@ -394,8 +381,9 @@ class Topic {
     if (private && private.arch == archive) {
       return Future.error(Exception('Cannot publish on inactive topic'));
     }
-    return setMeta(SetParams(desc: TopicDescription(
-        private: {'archive': archive ? true : DEL_CHAR})));
+    return setMeta(SetParams(
+        desc:
+            TopicDescription(private: {'archive': archive ? true : DEL_CHAR})));
   }
 
   /// Delete messages. Hard-deleting messages requires Owner permission
@@ -657,8 +645,8 @@ class Topic {
     return newer
         ? seq! > _maxSeq
         :
-    // _minSeq could be more than 1, but earlier messages could have been deleted.
-    (_minSeq > 1 && !_noEarlierMsgs);
+        // _minSeq could be more than 1, but earlier messages could have been deleted.
+        (_minSeq > 1 && !_noEarlierMsgs);
   }
 
   /// Check if the given seq Id is id of the most recent message
@@ -675,8 +663,10 @@ class Topic {
   void flushMessageRange(int fromId, int untilId) {
     // start, end: find insertion points (nearest == true).
     var since = _messages.find(DataMessage(seq: fromId), true);
-    return since >= 0 ? _messages.deleteRange(
-        since, _messages.find(DataMessage(seq: untilId), true)) : [];
+    return since >= 0
+        ? _messages.deleteRange(
+            since, _messages.find(DataMessage(seq: untilId), true))
+        : [];
   }
 
   /// Get type of the topic: me, p2p, grp, fnd...
@@ -745,9 +735,11 @@ class Topic {
 
     // Update locally cached contact with the new message count.
     var me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
-    me.setMsgReadRecv(name ?? '',
+    me.setMsgReadRecv(
+        name ?? '',
         (data.from == null || _tinodeService.isMe(data.from!)) ? 'read' : 'msg',
-        data.seq!, data.ts);
+        data.seq!,
+        data.ts);
   }
 
   /// Called by `Tinode`
@@ -784,25 +776,26 @@ class Topic {
     TopicSubscription? user;
     switch (pres.what) {
       case 'del':
-      // Delete cached messages.
+        // Delete cached messages.
         processDelMessages(pres.clear!, pres.delseq!);
         break;
 
       case 'on':
       case 'off':
-      // Update online status of a subscription.
+        // Update online status of a subscription.
         user = _users[pres.src];
         if (user != null) {
           user.online = pres.what == 'on';
         } else {
-          _loggerService.warn(
-              'Presence update for an unknown user' + (name ?? '') + ' ' +
-                  (pres.src ?? ''));
+          _loggerService.warn('Presence update for an unknown user' +
+              (name ?? '') +
+              ' ' +
+              (pres.src ?? ''));
         }
         break;
 
       case 'term':
-      // Attachment to topic is terminated probably due to cluster rehashing.
+        // Attachment to topic is terminated probably due to cluster rehashing.
         resetSubscription();
         break;
 
@@ -1004,8 +997,8 @@ class Topic {
 
   /// Update global user cache and local subscribers cache
   /// Don't call this method for non-subscribers
-  TopicSubscription? _updateCachedUser(String userId,
-      TopicSubscription object) {
+  TopicSubscription? _updateCachedUser(
+      String userId, TopicSubscription object) {
     var cached = _cacheManager.getUser(userId);
 
     if (cached != null) {
@@ -1101,8 +1094,10 @@ class Topic {
     // All messages could be missing or it could be a new topic with no messages.
     var last = _messages.length > 0 ? _messages.getLast() : null;
     var maxSeq = max(seq ?? 0, _maxSeq);
-    if ((maxSeq > 0 && last == null) || (last != null &&
-        (((last.hi != null && last.hi! > 0) ? last.hi : last.seq)! < maxSeq))) {
+    if ((maxSeq > 0 && last == null) ||
+        (last != null &&
+            (((last.hi != null && last.hi! > 0) ? last.hi : last.seq)! <
+                maxSeq))) {
       if (last != null && (last.hi != null && last.hi! > 0)) {
         // Extend existing gap
         last.hi = maxSeq;

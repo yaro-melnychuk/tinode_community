@@ -1,13 +1,12 @@
-import 'package:get_it/get_it.dart';
-import 'package:rxdart/rxdart.dart';
 import 'dart:io';
 
-import 'package:tinode/src/models/connection-options.dart';
-import 'package:tinode/src/services/logger.dart';
-import 'package:tinode/src/services/tools.dart';
-
-import 'package:web_socket_channel/status.dart' as status;
+import 'package:get_it/get_it.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
+
+import '../models/model.dart';
+import 'service.dart';
 
 /// This class is responsible for `ws` connection establishments
 ///
@@ -51,7 +50,8 @@ class ConnectionService {
       _loggerService.warn('Reconnecting...');
     }
     _connecting = true;
-    _ws = await WebSocket.connect(Tools.makeBaseURL(_options)).timeout(Duration(milliseconds: 5000));
+    _ws = await WebSocket.connect(Tools.makeBaseURL(_options))
+        .timeout(Duration(milliseconds: 5000));
     _connecting = false;
     _loggerService.log('Connected.');
     _channel = IOWebSocketChannel(_ws!);

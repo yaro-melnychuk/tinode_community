@@ -1,10 +1,7 @@
 import 'package:get_it/get_it.dart';
 
-import 'package:tinode/src/models/packet-types.dart' as packet_types;
-import 'package:tinode/src/services/configuration.dart';
-import 'package:tinode/src/models/packet-data.dart';
-import 'package:tinode/src/services/tools.dart';
-import 'package:tinode/src/models/packet.dart';
+import '../models/model.dart';
+import 'service.dart';
 
 class PacketGenerator {
   late ConfigService _configService;
@@ -16,7 +13,7 @@ class PacketGenerator {
   Packet generate(String type, String? topicName) {
     PacketData packetData;
     switch (type) {
-      case packet_types.Hi:
+      case Hi:
         packetData = HiPacketData(
           ver: _configService.appVersion,
           ua: _configService.userAgent,
@@ -26,7 +23,7 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Acc:
+      case Acc:
         packetData = AccPacketData(
           user: null,
           scheme: null,
@@ -39,7 +36,7 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Login:
+      case Login:
         packetData = LoginPacketData(
           scheme: null,
           secret: null,
@@ -47,7 +44,7 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Sub:
+      case Sub:
         packetData = SubPacketData(
           topic: topicName,
           set: null,
@@ -55,14 +52,14 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Leave:
+      case Leave:
         packetData = LeavePacketData(
           topic: topicName,
           unsub: false,
         );
         break;
 
-      case packet_types.Pub:
+      case Pub:
         packetData = PubPacketData(
           topic: topicName,
           noecho: false,
@@ -74,7 +71,7 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Get:
+      case Get:
         packetData = GetPacketData(
           topic: topicName,
           what: null,
@@ -84,7 +81,7 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Set:
+      case Set:
         packetData = SetPacketData(
           topic: topicName,
           desc: null,
@@ -93,7 +90,7 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Del:
+      case Del:
         packetData = DelPacketData(
           topic: topicName,
           what: null,
@@ -104,7 +101,7 @@ class PacketGenerator {
         );
         break;
 
-      case packet_types.Note:
+      case Note:
         packetData = NotePacketData(
           topic: topicName,
           seq: null,

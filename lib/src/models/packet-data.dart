@@ -1,5 +1,4 @@
-import 'package:tinode/src/models/set-params.dart';
-import 'package:tinode/src/models/get-query.dart';
+import 'model.dart';
 
 abstract class PacketData {
   Map<String, dynamic> toMap();
@@ -126,7 +125,14 @@ class PubPacketData extends PacketData {
   String? from;
   DateTime? ts;
 
-  PubPacketData({this.topic, this.noecho, this.head, this.content, this.seq, this.from, this.ts});
+  PubPacketData(
+      {this.topic,
+      this.noecho,
+      this.head,
+      this.content,
+      this.seq,
+      this.from,
+      this.ts});
 
   @override
   Map<String, dynamic> toMap() {
@@ -192,7 +198,8 @@ class DelPacketData extends PacketData {
   bool? hard;
   dynamic cred;
 
-  DelPacketData({this.topic, this.what, this.delseq, this.user, this.hard, this.cred});
+  DelPacketData(
+      {this.topic, this.what, this.delseq, this.user, this.hard, this.cred});
 
   @override
   Map<String, dynamic> toMap() {

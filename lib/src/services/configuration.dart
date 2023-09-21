@@ -1,7 +1,6 @@
 import 'dart:io' show Platform;
 
-import 'package:tinode/src/models/server-configuration.dart';
-import 'package:tinode/src/models/app-settings.dart';
+import '../models/model.dart';
 
 class ConfigService {
   late ServerConfiguration _serverConfiguration;
@@ -29,7 +28,10 @@ class ConfigService {
   }
 
   String get userAgent {
-    return appName + ' (Dart; ' + Platform.operatingSystem + '); tinode-dart/' +
+    return appName +
+        ' (Dart; ' +
+        Platform.operatingSystem +
+        '); tinode-dart/' +
         appVersion;
   }
 

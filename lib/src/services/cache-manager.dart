@@ -1,6 +1,6 @@
-import 'package:tinode/src/models/topic-subscription.dart';
-import 'package:tinode/src/models/access-mode.dart';
-import 'package:tinode/src/topic.dart';
+import 'package:tinode_community/src/topics/topic.dart';
+
+import '../models/model.dart';
 
 /// This is a data structure for user's data in cache
 class CacheUser {

@@ -1,7 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 
-import 'package:tinode/src/models/server-messages.dart';
-import 'package:tinode/src/models/auth-token.dart';
+import '../models/model.dart';
 
 class AuthService {
   String? _userId;

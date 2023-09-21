@@ -1,7 +1,8 @@
-name: tinode
+name: tinode_community
 description: This SDK implements Tinode client-side protocol for multi platform applications based on dart. 
-version: 1.0.0-alpha.4
+version: 1.0.0-alpha.5
 homepage: https://tinode.co/
+repository: https://github.com/Stark-Industries-Ltd/tinode_community.git
 
 environment:
   sdk: '>=2.12.0 <3.0.0'

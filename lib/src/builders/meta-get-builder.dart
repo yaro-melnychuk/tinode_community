@@ -1,12 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:tinode_community/src/models/topic-names.dart' as topic_names;
 
-import 'package:tinode/src/models/topic-names.dart' as topic_names;
-import 'package:tinode/src/models/topic-subscription.dart';
-import 'package:tinode/src/models/get-query.dart';
-import 'package:tinode/src/services/logger.dart';
-import 'package:tinode/src/services/tinode.dart';
-import 'package:tinode/src/topic-me.dart';
-import 'package:tinode/src/topic.dart';
+import '../models/model.dart';
+import '../services/service.dart';
+import '../topics/topic-me.dart';
+import '../topics/topic.dart';
 
 class MetaGetBuilder {
   /// Tinode service, responsible for handling messages, preparing packets and sending them
@@ -57,7 +55,8 @@ class MetaGetBuilder {
 
   /// Add query parameters to fetch messages older than the earliest saved message
   MetaGetBuilder withEarlierData(int limit) {
-    return withData(null, topic.minSeq!=null &&topic.minSeq > 0 ? topic.minSeq : null, limit);
+    return withData(null,
+        topic.minSeq != null && topic.minSeq > 0 ? topic.minSeq : null, limit);
   }
 
   /// Add query parameters to fetch topic description if it's newer than the given timestamp
@@ -110,7 +109,8 @@ class MetaGetBuilder {
     if (topic.getType() == 'me') {
       what['cred'] = true;
     } else {
-      _loggerService.error('Invalid topic type for MetaGetBuilder:withCreds ' + topic.getType().toString());
+      _loggerService.error('Invalid topic type for MetaGetBuilder:withCreds ' +
+          topic.getType().toString());
     }
     return this;
   }

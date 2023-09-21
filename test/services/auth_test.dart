@@ -1,8 +1,6 @@
 import 'package:test/test.dart';
-
-import 'package:tinode/src/models/auth-token.dart';
-import 'package:tinode/src/models/server-messages.dart';
-import 'package:tinode/src/services/auth.dart';
+import 'package:tinode_community/src/services/service.dart';
+import 'package:tinode_community/tinode.dart';
 
 void main() {
   var service = AuthService();

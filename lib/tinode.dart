@@ -3,58 +3,16 @@ library tinode;
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:rxdart/rxdart.dart';
 import 'package:get_it/get_it.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:tinode_community/src/models/topic-names.dart' as topic_names;
 
-import 'package:tinode/src/models/topic-names.dart' as topic_names;
-import 'package:tinode/src/models/server-configuration.dart';
-import 'package:tinode/src/models/connection-options.dart';
-import 'package:tinode/src/services/packet-generator.dart';
-import 'package:tinode/src/services/future-manager.dart';
-import 'package:tinode/src/models/server-messages.dart';
-import 'package:tinode/src/services/cache-manager.dart';
-import 'package:tinode/src/services/configuration.dart';
-import 'package:tinode/src/models/account-params.dart';
-import 'package:tinode/src/services/connection.dart';
-import 'package:tinode/src/models/access-mode.dart';
-import 'package:tinode/src/models/set-params.dart';
-import 'package:tinode/src/models/auth-token.dart';
-import 'package:tinode/src/models/del-range.dart';
-import 'package:tinode/src/models/get-query.dart';
-import 'package:tinode/src/services/logger.dart';
-import 'package:tinode/src/services/tinode.dart';
-import 'package:tinode/src/models/message.dart';
-import 'package:tinode/src/services/tools.dart';
-import 'package:tinode/src/services/auth.dart';
-import 'package:tinode/src/topic-fnd.dart';
-import 'package:tinode/src/topic-me.dart';
-import 'package:tinode/src/topic.dart';
+import 'tinode.dart';
 
-export 'package:tinode/src/models/server-configuration.dart';
-export 'package:tinode/src/models/connection-options.dart';
-export 'package:tinode/src/models/delete-transaction.dart';
-export 'package:tinode/src/models/topic-subscription.dart';
-export 'package:tinode/src/models/topic-description.dart';
-export 'package:tinode/src/models/server-messages.dart';
-export 'package:tinode/src/models/account-params.dart';
-export 'package:tinode/src/models/message-status.dart';
-export 'package:tinode/src/models/contact-update.dart';
-export 'package:tinode/src/models/app-settings.dart';
-export 'package:tinode/src/models/packet-types.dart';
-export 'package:tinode/src/models/packet-data.dart';
-export 'package:tinode/src/models/auth-token.dart';
-export 'package:tinode/src/models/auth-token.dart';
-export 'package:tinode/src/models/credential.dart';
-export 'package:tinode/src/models/set-params.dart';
-export 'package:tinode/src/meta-get-builder.dart';
-export 'package:tinode/src/models/del-range.dart';
-export 'package:tinode/src/models/get-query.dart';
-export 'package:tinode/src/services/tools.dart';
-export 'package:tinode/src/models/def-acs.dart';
-export 'package:tinode/src/sorted-cache.dart';
-export 'package:tinode/src/topic-fnd.dart';
-export 'package:tinode/src/topic-me.dart';
-export 'package:tinode/src/topic.dart';
+export 'package:tinode_community/src/builders/meta-get-builder.dart';
+export 'package:tinode_community/src/models/model.dart';
+export 'package:tinode_community/src/services/service.dart';
+export 'package:tinode_community/src/topics/index.dart';
 
 /// Provides a simple interface to interact with tinode server using websocket
 class Tinode {
@@ -306,8 +264,8 @@ class Tinode {
   }
 
   /// Create a new user. Wrapper for `account` method
-  Future createAccount(String scheme, String secret, bool login,
-      AccountParams? params) {
+  Future createAccount(
+      String scheme, String secret, bool login, AccountParams? params) {
     var promise = account(topic_names.USER_NEW, scheme, secret, login, params);
     if (login) {
       promise = promise.then((dynamic ctrl) {
@@ -320,28 +278,28 @@ class Tinode {
 
   /// Create user with 'basic' authentication scheme and immediately
   /// use it for authentication. Wrapper for `createAccount`
-  Future createAccountBasic(String username, String password, bool login,
-      AccountParams? params) {
+  Future createAccountBasic(
+      String username, String password, bool login, AccountParams? params) {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     return createAccount('basic', secret, login, params);
   }
 
   /// Update account with basic
-  Future updateAccountBasic(String userId, String username, String password,
-      AccountParams? params) {
+  Future updateAccountBasic(
+      String userId, String username, String password, AccountParams? params) {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     return account(userId, 'basic', secret, false, params);
   }
 
   /// Authenticate current session
-  Future<CtrlMessage> login(String scheme, String secret,
-      Map<String, dynamic>? cred) {
+  Future<CtrlMessage> login(
+      String scheme, String secret, Map<String, dynamic>? cred) {
     return _tinodeService.login(scheme, secret, cred);
   }
 
   /// Wrapper for `login` with basic authentication
-  Future<CtrlMessage> loginBasic(String username, String password,
-      Map<String, dynamic>? cred) async {
+  Future<CtrlMessage> loginBasic(
+      String username, String password, Map<String, dynamic>? cred) async {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     var ctrl = await login('basic', secret, cred);
     _authService.setLastLogin(username);
@@ -358,8 +316,8 @@ class Tinode {
   /// * method - method to use for resetting the secret, such as "email" or "tel"
   /// * value - value of the credential to use, a specific email address or a phone number
   Future requestResetSecret(String scheme, String method, String value) {
-    var secret = base64.encode(
-        utf8.encode(scheme + ':' + method + ':' + value));
+    var secret =
+        base64.encode(utf8.encode(scheme + ':' + method + ':' + value));
     return login('reset', secret, null);
   }
 

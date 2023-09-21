@@ -1,4 +1,4 @@
-import 'package:tinode/src/models/topic-subscription.dart';
+import 'model.dart';
 
 class ContactUpdateEvent {
   final TopicSubscription contact;

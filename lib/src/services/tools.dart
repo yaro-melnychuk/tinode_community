@@ -1,9 +1,8 @@
 import 'dart:math';
 
-import 'package:tinode/src/models/topic-names.dart' as topic_names;
-import 'package:tinode/src/models/connection-options.dart';
-import 'package:tinode/src/models/access-mode.dart';
-import 'package:tinode/src/models/values.dart';
+import 'package:tinode_community/src/models/topic-names.dart' as topic_names;
+
+import '../models/model.dart';
 
 /// Initialize a random message Id
 var messageId = Random().nextInt(0xFFFF) + 0xFFFF;
@@ -24,7 +23,10 @@ class Tools {
 
   /// Json parser helper to read messages and converting data to native objects
   static dynamic jsonParserHelper(key, value) {
-    if (key == 'ts' && value is String && value.length >= 20 && value.length <= 24) {
+    if (key == 'ts' &&
+        value is String &&
+        value.length >= 20 &&
+        value.length <= 24) {
       var date = DateTime.parse(value);
       return date;
     } else if (key == 'acs' && value is Map) {
@@ -70,13 +72,17 @@ class Tools {
   /// Figure out if the topic name belongs to a new group
   static bool isNewGroupTopicName(String topicName) {
     var prefix = topicName.substring(0, 3);
-    return (topicName is String) && (prefix == topic_names.TOPIC_NEW || prefix == topic_names.TOPIC_NEW_CHAN);
+    return (topicName is String) &&
+        (prefix == topic_names.TOPIC_NEW ||
+            prefix == topic_names.TOPIC_NEW_CHAN);
   }
 
   /// Figure out if the topic name belongs to a new channel
   static bool isChannelTopicName(String topicName) {
     var prefix = topicName.substring(0, 3);
-    return (topicName is String) && (prefix == topic_names.TOPIC_CHAN || prefix == topic_names.TOPIC_NEW_CHAN);
+    return (topicName is String) &&
+        (prefix == topic_names.TOPIC_CHAN ||
+            prefix == topic_names.TOPIC_NEW_CHAN);
   }
 
   /// Create authorized URL
