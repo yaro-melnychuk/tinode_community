@@ -44,14 +44,16 @@ class ConnectionService {
   }
 
   /// Start opening websocket connection
-  Future connect() async {
+  Future connect({Map<String, dynamic>? headers}) async {
     _loggerService.log('Connecting to ' + Tools.makeBaseURL(_options));
     if (isConnected) {
       _loggerService.warn('Reconnecting...');
     }
     _connecting = true;
-    _ws = await WebSocket.connect(Tools.makeBaseURL(_options))
-        .timeout(Duration(milliseconds: 5000));
+    _ws = await WebSocket.connect(
+      Tools.makeBaseURL(_options),
+      headers: headers,
+    ).timeout(Duration(milliseconds: 5000));
     _connecting = false;
     _loggerService.log('Connected.');
     _channel = IOWebSocketChannel(_ws!);

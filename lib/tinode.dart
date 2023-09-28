@@ -195,9 +195,9 @@ class Tinode {
   }
 
   /// Open the connection and send a hello packet to server
-  Future connect() async {
+  Future connect({Map<String, dynamic>? headers}) async {
     _doSubscriptions();
-    await _connectionService.connect();
+    await _connectionService.connect(headers: headers);
     return hello();
   }
 
